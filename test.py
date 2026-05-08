@@ -9,14 +9,14 @@ spark = SparkSession.builder.appName("MyApp").master("local[*]") \
     .config("spark.driver.maxResultSize", "1g") \
     .config("spark.sql.adaptive.enabled", "true") \
     .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
-    .config("spark.sql.shuffle.partitions", "8") \
-    .config("spark.default.parallelism", "8") \
+    .config("spark.sql.shuffle.partitions", "2") \
+    .config("spark.default.parallelism", "2") \
     .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer") \
     .config("spark.sql.execution.arrow.pyspark.enabled", "true") \
     .config("spark.sql.files.maxPartitionBytes", "64m") \
     .config("spark.sql.files.openCostInBytes", "4194304") \
     .getOrCreate()
-df = spark.read.parquet('./food.parquet')
+df = spark.read.parquet('hdfs://localhost:8020/test/food.parquet')
 
 
 df_single = df.select("with_sweeteners").dropna()
