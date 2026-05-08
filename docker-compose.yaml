@@ -18,22 +18,46 @@ services:
    namenode:
       build: .
       hostname: namenode
-      command: ["hdfs", "namenode"]
+      command: bash -c "hdfs namenode && hdfs dfs -mkdir /test && hdfs dfs -put /data/food.parquet /test && hdfs dfs -ls /test/"
+      platform: linux/arm64
       ports:
         - 9870:9870
+        - 8020:8020
       env_file:
         - ./config
       environment:
           ENSURE_NAMENODE_DIR: "/tmp/hadoop-root/dfs/name"
-   datanode:
+      volumes:
+      - /Users/bw/GITS/ITMO/SPARL_LAB2/data:/data
+   datanode1:
       build: .
-      command: ["hdfs", "datanode"]
+      command: >
+        bash -c "hdfs datanode & yarn nodemanager"
+      platform: linux/arm64
+      ports:
+      - "9864:9864"   # DataNode IPC
+      - "9866:9866"   # DataNode Data
       env_file:
         - ./config
+      volumes:
+      - /Users/bw/GITS/ITMO/SPARL_LAB2/data:/data
+   datanode2:
+      build: .
+      command: >
+        bash -c "hdfs datanode & yarn nodemanager"
+      platform: linux/arm64
+      ports:
+      - "9865:9864"   # DataNode IPC
+      - "9867:9866"   # DataNode Data
+      env_file:
+        - ./config
+      volumes:
+      - /Users/bw/GITS/ITMO/SPARL_LAB2/data:/data
    resourcemanager:
       build: .
       hostname: resourcemanager
       command: ["yarn", "resourcemanager"]
+      platform: linux/arm64
       ports:
          - 8088:8088
       env_file:
@@ -43,5 +67,29 @@ services:
    nodemanager:
       build: .
       command: ["yarn", "nodemanager"]
+      platform: linux/arm64
       env_file:
         - ./config
+   spark-py:
+    build: ../
+    # image: apache/spark-py
+    deploy:
+      resources:
+        limits:
+          memory: 16G  # Или 16G по вашему Mac M1
+        reservations:
+          memory: 8G
+    command: tail -f /dev/null  
+    environment:
+      - SPARK_EXECUTOR_MEMORY=2g
+      - SPARK_DRIVER_MEMORY=8g
+      - SPARK_EXECUTOR_CORES=1
+      - SPARK_SQL_ADAPTIVE_ENABLED=true
+      - SPARK_SQL_FILES_MAX_PARTITION_BYTES=134217728 
+    volumes:
+        - /Users/bw/GITS/ITMO/SPARL_LAB2/model/test.py:/opt/test.py
+
+
+networks:
+  default:
+    name: hadoop-net
