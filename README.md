@@ -1,0 +1,1 @@
+/opt/spark/bin/spark-submit --master local[*] --executor-memory 2g --driver-memory 8g /opt/test.py 
