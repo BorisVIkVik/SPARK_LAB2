@@ -27,11 +27,18 @@ https://huggingface.co/datasets/openfoodfacts/product-database
     src: Папка для кода модели.
     hadoop: Папка для кода hdfs с docker.
 ## Запуск
+Вариант 1:
+
 HDFS:
+
     docker compose -f ./hadoop/docker-compose.yaml --project-directory ./hadoop up -d
 Когда HDFS загружен запускаем код для загрузки данных:
+
     python src/load.py
 После запускаем Python скрипт:
+
     python src/main.py
     
+Варинат 2:
 
+    ./runapp.sh
