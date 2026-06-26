@@ -1,0 +1,21 @@
+
+spark:
+  master: local[*]
+  app_name: MyApp
+
+  
+  
+  configs:
+    spark.driver.memory: 8g
+    spark.executor.memory: 2g
+    spark.driver.maxResultSize: 1g
+    spark.sql.adaptive.enabled: true
+    spark.sql.adaptive.coalescePartitions.enabled: true
+    spark.sql.shuffle.partitions: 8
+    spark.default.parallelism: 8
+    spark.serializer", "org.apache.spark.seriali: KryoSerializer
+    spark.sql.execution.arrow.pyspark.enabled: true
+    spark.sql.files.maxPartitionBytes: 256m
+    spark.sql.files.openCostInBytes: 4194304
+    spark.hadoop.dfs.client.use.datanode.hostname: true
+    spark.hadoop.dfs.datanode.use.datanode.hostname: true
