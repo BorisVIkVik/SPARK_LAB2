@@ -18,21 +18,23 @@ spark = SparkSession.builder.appName("MyApp").master("local[*]") \
     .config("spark.sql.execution.arrow.pyspark.enabled", "true") \
     .config("spark.sql.files.maxPartitionBytes", "64m") \
     .config("spark.sql.files.openCostInBytes", "4194304") \
+    .config("spark.hadoop.dfs.client.use.datanode.hostname", "true") \
+    .config("spark.hadoop.dfs.datanode.use.datanode.hostname", "true") \
     .getOrCreate()
-df = spark.read.parquet('hdfs://namenode:8020/test/food.parquet')
+df = spark.read.parquet('hdfs://localhost:8020/test/food.parquet')
 
 
-df_single = df.select("with_sweeteners").dropna()
+df_single = df.select("known_ingredients_n").dropna()
 # del df
 print(f'Hello count: {df_single.count()}')
 # del df_single
 
 assembler = VectorAssembler(
-    inputCols=["with_sweeteners"],
+    inputCols=["known_ingredients_n"],
     outputCol="features"
 )
 
-df2 = assembler.transform(df.fillna(0, subset=["with_sweeteners"]))
+df2 = assembler.transform(df.fillna(0, subset=["known_ingredients_n"]))
 # del df
 kmeans = KMeans(featuresCol='features',k=2)
 model = kmeans.fit(df2)
@@ -42,7 +44,7 @@ centers = model.clusterCenters()
 print("Cluster Centers: ")
 for center in centers:
     print(center)
-df = spark.createDataFrame(centers, IntegerType())
-df.write.mode("overwrite").csv("hdfs://namenode:8020/test/output.csv")
+df = spark.createDataFrame([center.tolist() for center in centers])
+df.write.mode("overwrite").csv("hdfs://localhost:8020/test/output.csv")
 print(spark)
 spark.stop()
