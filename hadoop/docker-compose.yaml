@@ -63,24 +63,6 @@ services:
       platform: linux/arm64
       env_file:
         - ./config
-   spark-py:
-    build: ../
-    # image: apache/spark-py
-    deploy:
-      resources:
-        limits:
-          memory: 16G  # Или 16G по вашему Mac M1
-        reservations:
-          memory: 8G
-    command: tail -f /dev/null  
-    environment:
-      - SPARK_EXECUTOR_MEMORY=2g
-      - SPARK_DRIVER_MEMORY=8g
-      - SPARK_EXECUTOR_CORES=1
-      - SPARK_SQL_ADAPTIVE_ENABLED=true
-      - SPARK_SQL_FILES_MAX_PARTITION_BYTES=134217728 
-    volumes:
-        - /Users/bw/GITS/ITMO/SPARL_LAB2/model/test.py:/opt/test.py
 
 
 networks:
